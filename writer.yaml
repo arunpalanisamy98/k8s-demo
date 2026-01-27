@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-writer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-writer
+  template:
+    metadata:
+      labels:
+        app: file-writer
+    spec:
+      containers:
+      - name: writer
+        image: python:3.11-slim
+
+        command:
+          - python
+          - /app/writer.py
+          - /app/output.log
+          - --stress
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "250Mi"
+
+        volumeMounts:
+        - name: app-volume
+          mountPath: /app
+
+      volumes:
+      - name: app-volume
+        hostPath:
+          path: /mnt/myapp
+          type: Directory
+
